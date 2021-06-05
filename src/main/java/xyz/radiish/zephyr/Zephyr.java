@@ -1,49 +1,52 @@
 package xyz.radiish.zephyr;
 
-import com.google.gson.*;
-import com.google.gson.reflect.TypeToken;
 import com.mojang.brigadier.CommandDispatcher;
-import com.mongodb.MongoClient;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DB;
+import com.mongodb.DBCollection;
+import com.mongodb.DBObject;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
-import xyz.radiish.zephyr.command.ZephyrListenerAdapter;
-import xyz.radiish.zephyr.cereal.JsonObjectBuilder;
 import xyz.radiish.zephyr.cereal.JsonSerializing;
+import xyz.radiish.zephyr.command.ZephyrListenerAdapter;
+import xyz.radiish.zephyr.storage.MongoHelper;
 import xyz.radiish.zephyr.storage.UserRecord;
 import xyz.radiish.zephyr.command.source.CommandSource;
-import xyz.radiish.zephyr.util.ClassUtils;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.lang.reflect.Type;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 public class Zephyr {
 
   private final CommandDispatcher<CommandSource> dispatcher;
   private Pattern prefix;
-  private JDA jda;
-  private MongoClient mongo;
-  private Map<User, UserRecord> userRecords;
+  private final JDA jda;
+  private final DB database;
+  private final DBCollection users;
+  private final DBCollection guilds;
 
-  public Zephyr(JDA jda, MongoClient mongo) {
+  public Zephyr(JDA jda, DB database) {
     dispatcher = new CommandDispatcher<>();
     setPrefix(";");
-    setJda(jda);
-    setMongo(mongo);
-    setUserRecords(new HashMap<>());
+    this.jda = jda;
+    this.database = database;
+    users = this.database.getCollection("users");
+    guilds = this.database.getCollection("guilds");
 
     getJda().addEventListener(new ZephyrListenerAdapter(this));
+  }
 
-    mongo.getUsedDatabases();
+  public UserRecord fetchUserRecord(User user) {
+    DBObject object = users.find(new BasicDBObject("_id", user.getIdLong())).one();
+    if(object != null) {
+      return JsonSerializing.deserialize(UserRecord.class, MongoHelper.objectToJson(object));
+    } else {
+      return new UserRecord(user);
+    }
+  }
+
+  public void updateUserRecord(UserRecord record) {
+    users.update(new BasicDBObject("_id", record.getId()), MongoHelper.jsonToObject(JsonSerializing.serialize(record).getAsJsonObject()), true, false);
   }
 
   public CommandDispatcher<CommandSource> getDispatcher() {
@@ -66,23 +69,15 @@ public class Zephyr {
     return jda;
   }
 
-  public void setJda(JDA jda) {
-    this.jda = jda;
+  public DB getDatabase() {
+    return database;
   }
 
-  public Map<User, UserRecord> getUserRecords() {
-    return userRecords;
+  public DBCollection getGuilds() {
+    return guilds;
   }
 
-  public void setUserRecords(Map<User, UserRecord> userRecords) {
-    this.userRecords = userRecords;
-  }
-
-  public MongoClient getMongo() {
-    return mongo;
-  }
-
-  public void setMongo(MongoClient mongo) {
-    this.mongo = mongo;
+  public DBCollection getUsers() {
+    return users;
   }
 }

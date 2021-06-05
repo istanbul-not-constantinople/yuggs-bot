@@ -12,6 +12,6 @@ public class KeyPermission extends Permission {
 
   @Override
   public boolean resolve(User user, CommandSource source) {
-    return source.getClient().getUserRecords().get(user).getPermissionKeys().contains(key);
+    return source.fetchUserRecord().getPermissionKeys().contains(key);
   }
 }

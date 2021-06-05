@@ -56,7 +56,7 @@ public class UwuifyCommand {
     for(UnaryOperator<String> morph : textMorphs) {
       text = morph.apply(text);
     }
-    source.getMessage().getChannel().sendMessage(new InformationBuilder().setDescription(text).setTitle("merry christmas ya filthy animal").build()).queue();
+    source.getMessage().reply(new InformationBuilder().setDescription(text).setTitle("merry christmas ya filthy animal").build()).mentionRepliedUser(false).queue();
     return severity;
   }
 }

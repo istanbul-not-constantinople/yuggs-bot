@@ -31,7 +31,6 @@ public class ZephyrListenerAdapter extends ListenerAdapter {
         } catch (CommandSyntaxException e) {
           event.getChannel().sendMessage(new ErrorBuilder()
             .appendDescription("```md\n")
-            //.appendDescription(parsed.getExceptions().values().stream().map(CommandSyntaxException::getMessage).reduce("", (total, ex) -> total + ex + "\n"))
             .appendDescription(e.getMessage())
             .appendDescription("```")
             .build()).queue();
@@ -40,7 +39,6 @@ public class ZephyrListenerAdapter extends ListenerAdapter {
         event.getChannel().sendMessage(new ErrorBuilder()
           .appendDescription("```md\n")
           .appendDescription(parsed.getExceptions().values().stream().map(CommandSyntaxException::getMessage).reduce("", (total, ex) -> total + ex + "\n"))
-          //.appendDescription(String.format("use ```\n;help argument %s```", parsed.getContext().getArguments().get(parsed.getContext().getArguments().size() - 1).getResult()))
           .appendDescription("```")
           .build()).queue();
       }

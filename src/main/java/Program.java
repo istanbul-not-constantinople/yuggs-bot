@@ -24,6 +24,6 @@ public class Program {
 
     MongoClient mongo = new MongoClient(new MongoClientURI(args[1]));
 
-    Zephyr client = new YuggsBot(jda, mongo);
+    Zephyr client = new YuggsBot(jda, mongo.getDB("yuggs"));
   }
 }

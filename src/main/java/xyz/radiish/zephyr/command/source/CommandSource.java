@@ -1,14 +1,9 @@
 package xyz.radiish.zephyr.command.source;
 
-import com.mojang.brigadier.arguments.ArgumentType;
-import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.requests.restaction.MessageAction;
 import xyz.radiish.zephyr.Zephyr;
-import xyz.radiish.zephyr.messaging.sendable.Sendable;
+import xyz.radiish.zephyr.storage.UserRecord;
 
 public class CommandSource {
   private final Message message;
@@ -20,7 +15,6 @@ public class CommandSource {
     this.message = message;
     this.client = client;
   }
-
 
   public boolean isPrivate() {
     return getGuild() == null;
@@ -36,5 +30,13 @@ public class CommandSource {
 
   public Zephyr getClient() {
     return client;
+  }
+
+  public UserRecord fetchUserRecord() {
+    return client.fetchUserRecord(message.getAuthor());
+  }
+
+  public void updateUserRecord(UserRecord record) {
+    client.updateUserRecord(record);
   }
 }

@@ -1,5 +1,6 @@
 package xyz.radiish.zephyr.storage;
 
+import net.dv8tion.jda.api.entities.User;
 import xyz.radiish.zephyr.cereal.JsonField;
 import xyz.radiish.zephyr.cereal.JsonSerializable;
 
@@ -17,9 +18,15 @@ public class UserRecord {
   @JsonField
   private int buttonClicks;
 
+  public UserRecord(User user) {
+    this();
+    setId(user.getIdLong());
+  }
+
   public UserRecord() {
     setPermissionKeys(new ArrayList<>());
     setId(0L);
+    setButtonClicks(0);
   }
 
   public List<String> getPermissionKeys() {
@@ -44,5 +51,13 @@ public class UserRecord {
       "id=" + id +
       ", permissionKeys=" + permissionKeys +
       '}';
+  }
+
+  public int getButtonClicks() {
+    return buttonClicks;
+  }
+
+  public void setButtonClicks(int buttonClicks) {
+    this.buttonClicks = buttonClicks;
   }
 }

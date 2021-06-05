@@ -14,7 +14,7 @@ import java.util.stream.StreamSupport;
 public class DefaultSerializers {
   public static List<JsonSerializer<?>> generateDefaultSerializers() {
     return Arrays.asList(
-      new JsonSerializer<Number>(Number.class) {
+      new JsonSerializer<>(Number.class) {
         @Override
         public JsonElement serialize(Number instance) {
           return new JsonPrimitive(instance);
@@ -26,7 +26,19 @@ public class DefaultSerializers {
         }
       },
 
-      new JsonSerializer<String>(String.class) {
+      new JsonSerializer<>(Boolean.class) {
+        @Override
+        public JsonElement serialize(Boolean instance) {
+          return new JsonPrimitive(instance);
+        }
+
+        @Override
+        public Boolean deserialize(Optional<Boolean> instance, JsonElement element, Type type) {
+          return element.getAsBoolean();
+        }
+      },
+
+      new JsonSerializer<>(String.class) {
         @Override
         public JsonElement serialize(String instance) {
           return new JsonPrimitive(instance);

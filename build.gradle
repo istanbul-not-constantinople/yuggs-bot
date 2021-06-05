@@ -2,7 +2,7 @@ plugins {
     id 'java'
 }
 
-group 'org.example'
+group 'xyz.radiish'
 version '1.0-SNAPSHOT'
 
 repositories {
@@ -14,9 +14,12 @@ repositories {
     maven {
         url "https://libraries.minecraft.net"
     }
+    flatDir {
+        dirs 'libs'
+    }
 }
 dependencies {
-    implementation project(':jda')
+    implementation name: 'jda-4.2.1'
     implementation 'org.mongodb:mongo-java-driver:2.12.3'
     //implementation "net.dv8tion:JDA:4.2.1_253"
     implementation 'com.google.code.gson:gson:2.8.6'

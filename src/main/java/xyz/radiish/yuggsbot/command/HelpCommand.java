@@ -27,9 +27,9 @@ public class HelpCommand {
       InformationBuilder builder = new InformationBuilder()
         .appendDescription("```md\n");
       suggestions.getList().forEach(suggestion -> builder.appendDescription(suggestion.getText() + "\n"));
-      context.getSource().getMessage().getChannel().sendMessage(builder
+      context.getSource().getMessage().reply(builder
         .appendDescription("```")
-        .build()).queue();
+        .build()).mentionRepliedUser(false).queue();
     });
     return 1;
   }
