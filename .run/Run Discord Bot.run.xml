@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Run Discord Bot" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="Program" />
+    <module name="xyz.radiish.hycord.main" />
+    <option name="PROGRAM_PARAMETERS" value="ODQzNDc1NDk5ODk2MDEyODMw.YKEZxg.V4Twhrp6b8ZCebd4ZjIYMYFMqgk localhost:27017" />
+    <method v="2">
+      <option name="Gradle.BeforeRunTask" enabled="true" tasks="build" externalProjectPath="$PROJECT_DIR$" vmOptions="" scriptParameters="" />
+    </method>
+  </configuration>
+</component>

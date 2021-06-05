@@ -1,2 +1,5 @@
 rootProject.name = 'xyz.radiish.hycord'
 
+include ':jda';
+
+project(':jda').projectDir = new File('D:\\Users\\Omen\\Downloads\\JDA-feature-selection-menus')
