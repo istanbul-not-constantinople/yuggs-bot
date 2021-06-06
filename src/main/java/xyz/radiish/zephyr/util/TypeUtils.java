@@ -11,8 +11,9 @@ public class TypeUtils {
       if (clazz.getSuperclass() != null) {
         supers.add(clazz.getSuperclass());
       }
+      supers.addAll(Arrays.asList(clazz.getInterfaces().clone()));
       return supers;
-    }).flatMap(oldClazz -> oldClazz.equals(Object.class) ? TreeUtils.highestCommonFactor(clazzes, clazz -> new HashSet<>(Arrays.asList(clazz.getInterfaces()))) : Optional.of(oldClazz)).orElse(Object.class);
+    }).orElse(Object.class);
   }
 
   public static Class<?> ofType(Type type) {

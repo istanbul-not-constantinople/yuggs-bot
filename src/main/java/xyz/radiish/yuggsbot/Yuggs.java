@@ -7,13 +7,14 @@ import xyz.radiish.yuggsbot.command.BigBlueButtonCommand;
 import xyz.radiish.yuggsbot.command.HelpCommand;
 import xyz.radiish.yuggsbot.command.UwuifyCommand;
 import xyz.radiish.zephyr.Zephyr;
+import xyz.radiish.zephyr.storage.ProviderKey;
+import xyz.radiish.zephyr.storage.ProviderKeyRegistry;
 
-import static xyz.radiish.zephyr.command.CommandManager.literal;
-import static xyz.radiish.zephyr.command.argument.LiteralCollectionArgumentType.literals;
+public class Yuggs extends Zephyr {
 
-public class YuggsBot extends Zephyr {
+  public static final ProviderKey<YuggsUserRecord> USER_RECORD = ProviderKeyRegistry.USERS.register("yuggs", YuggsUserRecord::new);
 
-  public YuggsBot(JDA jda, DB database) {
+  public Yuggs(JDA jda, DB database) {
     super(jda, database);
 
     jda.getPresence().setActivity(Activity.listening("more reasons to hate italy"));

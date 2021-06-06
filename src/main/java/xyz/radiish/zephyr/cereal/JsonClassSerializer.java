@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public class JsonClassSerializer<T extends JsonElementSerializer> extends JsonSerializer<T> {
 
-  public JsonClassSerializer(Class<T> clazz) {
+  public JsonClassSerializer(Class<? super T> clazz) {
     super(clazz);
   }
 

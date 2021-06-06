@@ -4,12 +4,11 @@ import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 import xyz.radiish.yuggsbot.command.BigBlueButtonCommand;
-import xyz.radiish.zephyr.storage.UserRecord;
 
 public class YuggsListenerAdapter extends ListenerAdapter {
-  private final YuggsBot client;
+  private final Yuggs client;
 
-  public YuggsListenerAdapter(YuggsBot client) {
+  public YuggsListenerAdapter(Yuggs client) {
     this.client = client;
   }
 
@@ -19,10 +18,10 @@ public class YuggsListenerAdapter extends ListenerAdapter {
     if(event.getComponent() != null && event.getComponent().getId() != null) {
       switch(event.getComponent().getId()) {
         case "big_blue":
-          UserRecord record = client.fetchUserRecord(event.getUser());
+          YuggsUserRecord record = client.fetchUserRecord(event.getUser()).get(Yuggs.USER_RECORD);
           record.setButtonClicks(record.getButtonClicks() + 1);
-          event.reply(BigBlueButtonCommand.messageFor(record)).queue();
-          client.updateUserRecord(record);
+          event.reply(BigBlueButtonCommand.messageFor(record.getButtonClicks())).queue();
+          record.update();
           break;
       }
     }

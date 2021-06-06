@@ -20,13 +20,15 @@ import java.util.stream.StreamSupport;
 public class MongoHelper {
   private static Object jsonElementToObject(JsonElement element) {
     if(element.isJsonObject()) {
-      return MongoHelper.jsonElementToObject(element.getAsJsonObject());
+      return MongoHelper.jsonToObject(element.getAsJsonObject());
     } else if(element.isJsonArray()) {
       return StreamSupport.stream(element.getAsJsonArray().spliterator(), false).map(MongoHelper::jsonElementToObject).collect(Collectors.toList());
     } else if(element.isJsonNull()) {
       return JsonNull.INSTANCE;
     } else if(element.getAsJsonPrimitive().isBoolean()) {
       return element.getAsBoolean();
+    } else if(element.getAsJsonPrimitive().isString()) {
+      return element.getAsString();
     } else {
       return element.getAsNumber();
     }
@@ -34,7 +36,6 @@ public class MongoHelper {
 
   public static DBObject jsonToObject(JsonObject json) {
     BasicDBObject mongo = new BasicDBObject();
-    mongo.append("_id", json.get("_id").toString());
     json.entrySet().forEach(entry -> mongo.append(entry.getKey(), jsonElementToObject(entry.getValue())));
     return mongo;
   }

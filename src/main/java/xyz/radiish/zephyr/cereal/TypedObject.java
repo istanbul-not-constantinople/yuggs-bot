@@ -3,9 +3,11 @@ package xyz.radiish.zephyr.cereal;
 import com.google.gson.JsonElement;
 
 import java.lang.reflect.Type;
+import java.util.Optional;
 
+@JsonSerializable
 public class TypedObject<T> implements JsonElementSerializer {
-  private T value;
+  private Object value;
   private Type type;
 
   public TypedObject(T value, Type type) {
@@ -24,7 +26,8 @@ public class TypedObject<T> implements JsonElementSerializer {
 
   @Override
   public void deserialize(JsonElement element, Type type) {
-    JsonSerializing.deserialize(getType(), element.getAsJsonObject().get("value"));
+    this.type = DefaultSerializers.TYPE_SERIALIZER.deserialize(Optional.empty(), element.getAsJsonObject().get("type"), Type.class);
+    value = JsonSerializing.deserialize(getType(), element.getAsJsonObject().get("value"));
   }
 
   @Override
@@ -33,7 +36,7 @@ public class TypedObject<T> implements JsonElementSerializer {
   }
 
   public T getValue() {
-    return value;
+    return (T) value;
   }
 
   public Type getType() {

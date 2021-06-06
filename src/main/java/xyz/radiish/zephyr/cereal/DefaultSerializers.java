@@ -156,7 +156,7 @@ public class DefaultSerializers {
         try {
           return Class.forName(object.get("class").getAsString());
         } catch (ClassNotFoundException ignored) {
-          // ignored innit bruv
+          //ignored
         }
       } else if(object.has("upper")) {
         TypeUtils.WildcardTypeBuilder builder = new TypeUtils.WildcardTypeBuilder();

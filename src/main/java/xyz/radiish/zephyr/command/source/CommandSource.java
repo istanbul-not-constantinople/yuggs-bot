@@ -3,7 +3,8 @@ package xyz.radiish.zephyr.command.source;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import xyz.radiish.zephyr.Zephyr;
-import xyz.radiish.zephyr.storage.UserRecord;
+import xyz.radiish.zephyr.storage.RecordProvider;
+import xyz.radiish.zephyr.storage.ZephyrUserRecord;
 
 public class CommandSource {
   private final Message message;
@@ -32,11 +33,11 @@ public class CommandSource {
     return client;
   }
 
-  public UserRecord fetchUserRecord() {
+  public RecordProvider fetchUserRecord() {
     return client.fetchUserRecord(message.getAuthor());
   }
 
-  public void updateUserRecord(UserRecord record) {
+  public void updateUserRecord(RecordProvider record) {
     client.updateUserRecord(record);
   }
 }

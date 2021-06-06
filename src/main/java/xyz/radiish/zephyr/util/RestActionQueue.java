@@ -22,7 +22,6 @@ public class RestActionQueue<T, U> {
 
   public void flush() {
     if(!isEmptying()) {
-      System.out.println(" >> emptying queue (" + getQueue().size() + ")");
       setEmptying(true);
       emptyQueue();
     }
@@ -30,7 +29,6 @@ public class RestActionQueue<T, U> {
 
   private void emptyQueue() {
     if(getQueue().size() > 0) {
-      System.out.println("   >> emptying entry");
       getClear().apply(getQueue().get(0)).queue(result -> {
         getQueueConsumer().accept(result);
         emptyQueue();

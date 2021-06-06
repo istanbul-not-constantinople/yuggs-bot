@@ -29,34 +29,6 @@ public class JsonSerializing {
       put(void.class, Void.class);
   }};
 
-  public static AnnotationInfo generateAnnotationInfo(Field field, Class<?> clazz, Class<? extends Annotation> annotation) {
-    String defaultName = field.getName();
-    if(field.getName().startsWith("get") || field.getName().startsWith("set")) {
-      defaultName = field.getName().substring(3);
-    } else if(field.getName().startsWith("if")) {
-      defaultName = field.getName().substring(2);
-    }
-    return generateAnnotationInfo(field.getAnnotation(annotation), defaultName, clazz, annotation);
-  }
-
-  public static AnnotationInfo generateAnnotationInfo(Method method, Class<?> clazz, Class<? extends Annotation> annotation) {
-    return generateAnnotationInfo(method.getAnnotation(annotation), method.getName(), clazz, annotation);
-  }
-
-  public static AnnotationInfo generateAnnotationInfo(Annotation anno, String defaultName, Class<?> clazz, Class<? extends Annotation> annotation) {
-    try {
-      String value = (String) annotation.getMethod("value").invoke(anno);
-      if(value.equals("*")) {
-        return new AnnotationInfo(clazz.getAnnotation(JsonSerializable.class).caseType().encase(defaultName));
-      } else {
-        return new AnnotationInfo(clazz.getAnnotation(JsonSerializable.class).caseType().encase(value));
-      }
-    } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-      e.printStackTrace();
-    }
-    return new AnnotationInfo("");
-  }
-
   public static void initialize() {
     setSerializers(new ArrayList<>());
 
@@ -64,16 +36,34 @@ public class JsonSerializing {
 
     REFLECTIONS = new Reflections("", new SubTypesScanner(), new TypeAnnotationsScanner());
     REFLECTIONS.getTypesAnnotatedWith(JsonSerializable.class).forEach(clazz -> {
-      Set<Field> myFields = Arrays.stream(clazz.getFields()).collect(Collectors.toSet());
-      myFields.addAll(Arrays.stream(clazz.getDeclaredFields()).collect(Collectors.toSet()));
-      myFields.forEach(field -> field.setAccessible(true));
-      Set<Pair<AnnotationInfo, Field>> myFieldMappings = myFields.stream().filter(field -> field.isAnnotationPresent(JsonField.class)).map(field -> Pair.of(generateAnnotationInfo(field, clazz, JsonField.class), field)).collect(Collectors.toSet());
+      if(TypeUtils.highestCommonFactor(Set.of(clazz, JsonElementSerializer.class)) == JsonElementSerializer.class) {
+        getSerializers().add(new JsonClassSerializer<>(clazz));
+      } else {
+        Set<Field> myFields = Arrays.stream(clazz.getFields()).collect(Collectors.toSet());
+        myFields.addAll(Arrays.stream(clazz.getDeclaredFields()).collect(Collectors.toSet()));
+        myFields.forEach(field -> field.setAccessible(true));
+        List<Pair<AnnotationInfo, Field>> fieldMappings = new ArrayList<>(myFields.stream().filter(field -> field.isAnnotationPresent(JsonField.class)).map(field -> {
+          JsonField annotation = field.getAnnotation(JsonField.class);
+          return Pair.of(AnnotationInfo.of(annotation.value(), field.getName(), field.getDeclaringClass().getAnnotation(JsonSerializable.class).caseType(), annotation.priority()), field);
+        }).collect(Collectors.toSet()));
+        fieldMappings.sort(Comparator.comparingInt(pair -> pair.getLeft().getPriority()));
 
-      Set<Method> myMethods = Arrays.stream(clazz.getMethods()).collect(Collectors.toSet());
-       myMethods.addAll(Arrays.stream(clazz.getDeclaredMethods()).collect(Collectors.toSet()));
-      Set<Pair<AnnotationInfo, Method>> getters = myMethods.stream().filter(method -> method.isAnnotationPresent(JsonGetter.class)).map(method -> Pair.of(generateAnnotationInfo(method, clazz, JsonField.class), method)).collect(Collectors.toSet());
-      Set<Pair<AnnotationInfo, Method>> setters = myMethods.stream().filter(method -> method.isAnnotationPresent(JsonSetter.class)).map(method -> Pair.of(generateAnnotationInfo(method, clazz, JsonField.class), method)).collect(Collectors.toSet());
-      getSerializers().add(new JsonSerializationMapping<>(clazz, myFieldMappings, getters, setters));
+        Set<Method> myMethods = Arrays.stream(clazz.getMethods()).collect(Collectors.toSet());
+        myMethods.addAll(Arrays.stream(clazz.getDeclaredMethods()).collect(Collectors.toSet()));
+
+        List<Pair<AnnotationInfo, Method>> getters = new ArrayList<>(myMethods.stream().filter(method -> method.isAnnotationPresent(JsonGetter.class)).map(method -> {
+          JsonGetter annotation = method.getAnnotation(JsonGetter.class);
+          return Pair.of(AnnotationInfo.of(annotation.value(), method.getName(), method.getDeclaringClass().getAnnotation(JsonSerializable.class).caseType(), annotation.priority()), method);
+        }).collect(Collectors.toSet()));
+        getters.sort(Comparator.comparingInt(pair -> pair.getLeft().getPriority()));
+        List<Pair<AnnotationInfo, Method>> setters = new ArrayList<>(myMethods.stream().filter(method -> method.isAnnotationPresent(JsonSetter.class)).map(method -> {
+          JsonSetter annotation = method.getAnnotation(JsonSetter.class);
+          return Pair.of(AnnotationInfo.of(annotation.value(), method.getName(), method.getDeclaringClass().getAnnotation(JsonSerializable.class).caseType(), annotation.priority()), method);
+        }).collect(Collectors.toSet()));
+        setters.sort(Comparator.comparingInt(pair -> pair.getLeft().getPriority()));
+
+        getSerializers().add(new JsonSerializationMapping<>(clazz, fieldMappings, getters, setters));
+      }
     });
   }
 
@@ -88,7 +78,7 @@ public class JsonSerializing {
       Set<JsonObjectSerializer<?>> serializers = new HashSet<>();
       Optional<JsonSerializer<?>> serial = getSerializers().stream().filter(serializer -> serializer.getClazz() == clazz).findFirst();
       if(serial.isPresent()) {
-        if(serial.get() instanceof JsonObjectSerializer) {
+        if(serial.get() instanceof JsonObjectSerializer<?>) {
           serializers.add((JsonObjectSerializer<?>) serial.get());
         } else {
           return (JsonSerializer<T>) serial.get();
@@ -112,7 +102,7 @@ public class JsonSerializing {
           return (JsonSerializer<T>) interserial;
         }
       }
-      return new CompoundJsonObjectSerializer<>(clazz, serializers);
+      return new CompoundJsonObjectSerializer<>(clazz, serializers.stream().map(serializer -> (JsonObjectSerializer<? super T>) serializer).collect(Collectors.toSet()));
     }
   }
 

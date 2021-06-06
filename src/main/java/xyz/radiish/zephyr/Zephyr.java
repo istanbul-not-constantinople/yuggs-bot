@@ -1,22 +1,19 @@
 package xyz.radiish.zephyr;
 
 import com.mojang.brigadier.CommandDispatcher;
-import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.User;
-import xyz.radiish.zephyr.cereal.JsonSerializing;
 import xyz.radiish.zephyr.command.ZephyrListenerAdapter;
-import xyz.radiish.zephyr.storage.MongoHelper;
-import xyz.radiish.zephyr.storage.UserRecord;
+import xyz.radiish.zephyr.storage.*;
 import xyz.radiish.zephyr.command.source.CommandSource;
 
-import java.util.Map;
+import java.util.function.UnaryOperator;
 import java.util.regex.Pattern;
 
 public class Zephyr {
+  public static final ProviderKey<ZephyrUserRecord> USER_RECORD = ProviderKeyRegistry.USERS.register("zephyr", ZephyrUserRecord::new);
 
   private final CommandDispatcher<CommandSource> dispatcher;
   private Pattern prefix;
@@ -36,11 +33,13 @@ public class Zephyr {
     getJda().addEventListener(new ZephyrListenerAdapter(this));
   }
 
-  public UserRecord fetchUserRecord(User user) {
-    return MongoHelper.fetch(users, user.getIdLong(), UserRecord.class, () -> new UserRecord(user));
+  public RecordProvider fetchUserRecord(User user) {
+    RecordProvider provider = MongoHelper.fetch(users, user.getIdLong(), RecordProvider.class, () -> new RecordProvider(ProviderKeyRegistry.USERS, user.getIdLong()));
+    provider.setClient(this);
+    return provider;
   }
 
-  public void updateUserRecord(UserRecord record) {
+  public void updateUserRecord(RecordProvider record) {
     MongoHelper.update(users, record, record.getId());
   }
 

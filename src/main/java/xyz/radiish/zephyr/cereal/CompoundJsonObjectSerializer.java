@@ -10,11 +10,11 @@ import java.util.stream.Collectors;
 
 public class CompoundJsonObjectSerializer<T> extends JsonObjectSerializer<T> {
 
-  private final Set<JsonObjectSerializer<T>> serializers;
+  private final Set<JsonObjectSerializer<? super T>> serializers;
 
-  public CompoundJsonObjectSerializer(Class<T> clazz, Set<JsonObjectSerializer<?>> serializers) {
+  public CompoundJsonObjectSerializer(Class<T> clazz, Set<JsonObjectSerializer<? super T>> serializers) {
     super(clazz);
-    this.serializers = serializers.stream().map(b -> (JsonObjectSerializer<T>) b).collect(Collectors.toSet());
+    this.serializers = serializers;
 
   }
 

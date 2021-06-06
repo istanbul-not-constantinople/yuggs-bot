@@ -9,4 +9,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface JsonSetter {
   String value() default "*";
+  int priority() default 1;
 }

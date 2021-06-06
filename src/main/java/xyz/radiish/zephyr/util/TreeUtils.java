@@ -6,13 +6,11 @@ import java.util.stream.Collectors;
 
 public class TreeUtils {
   public static <T> List<T> findAllParents(T child, Function<T, Set<T>> parentizer) {
-    System.out.printf("parents of (%s): ", child);
     List<T> results = new ArrayList<>();
     results.add(child);
     for(T parent : parentizer.apply(child)) {
       results.addAll(findAllParents(parent, parentizer));
     }
-    System.out.printf("%s%n", results);
     return results;
   }
   public static <T> Optional<T> highestCommonFactor(Set<T> children, Function<T, Set<T>> parentizer) {

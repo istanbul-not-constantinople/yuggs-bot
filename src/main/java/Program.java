@@ -1,10 +1,10 @@
-  import com.mongodb.MongoClient;
-  import com.mongodb.MongoClientURI;
-  import net.dv8tion.jda.api.JDA;
-  import net.dv8tion.jda.api.JDABuilder;
-  import xyz.radiish.yuggsbot.YuggsBot;
-  import xyz.radiish.zephyr.Zephyr;
-  import xyz.radiish.zephyr.cereal.JsonSerializing;
+import com.mongodb.MongoClient;
+import com.mongodb.MongoClientURI;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.JDABuilder;
+import xyz.radiish.yuggsbot.Yuggs;
+import xyz.radiish.zephyr.Zephyr;
+import xyz.radiish.zephyr.cereal.JsonSerializing;
 
 public class Program {
   public static void main(String[] args) throws Exception {
@@ -18,6 +18,6 @@ public class Program {
 
     MongoClient mongo = new MongoClient(new MongoClientURI(args[1]));
 
-    Zephyr client = new YuggsBot(jda, mongo.getDB("yuggs"));
+    Zephyr client = new Yuggs(jda, mongo.getDB("yuggs"));
   }
 }
