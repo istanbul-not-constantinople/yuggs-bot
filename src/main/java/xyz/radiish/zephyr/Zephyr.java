@@ -37,16 +37,11 @@ public class Zephyr {
   }
 
   public UserRecord fetchUserRecord(User user) {
-    DBObject object = users.find(new BasicDBObject("_id", user.getIdLong())).one();
-    if(object != null) {
-      return JsonSerializing.deserialize(UserRecord.class, MongoHelper.objectToJson(object));
-    } else {
-      return new UserRecord(user);
-    }
+    return MongoHelper.fetch(users, user.getIdLong(), UserRecord.class, () -> new UserRecord(user));
   }
 
   public void updateUserRecord(UserRecord record) {
-    users.update(new BasicDBObject("_id", record.getId()), MongoHelper.jsonToObject(JsonSerializing.serialize(record).getAsJsonObject()), true, false);
+    MongoHelper.update(users, record, record.getId());
   }
 
   public CommandDispatcher<CommandSource> getDispatcher() {

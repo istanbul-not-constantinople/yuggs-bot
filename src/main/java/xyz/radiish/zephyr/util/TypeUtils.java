@@ -4,7 +4,7 @@ package xyz.radiish.zephyr.util;
 import java.lang.reflect.*;
 import java.util.*;
 
-public class ClassUtils {
+public class TypeUtils {
   public static Class<?> highestCommonFactor(Set<Class<?>> clazzes) {
     return TreeUtils.highestCommonFactor(clazzes, clazz -> {
       Set<Class<?>> supers = new HashSet<>();
@@ -32,6 +32,7 @@ public class ClassUtils {
 
   public static class ParameterizedTypeBuilder {
     private List<Type> parameters;
+    private Type owner;
     private final Class<?> raw;
 
     public ParameterizedTypeBuilder(Class<?> raw) {
@@ -49,6 +50,10 @@ public class ClassUtils {
       return this;
     }
 
+    public ParameterizedTypeBuilder setOwner(Type owner) {
+      this.owner = owner;
+      return this;
+    }
 
     public ParameterizedType build() {
       return new ParameterizedType() {
@@ -64,11 +69,60 @@ public class ClassUtils {
 
         @Override
         public Type getOwnerType() {
-          return null;
+          return owner;
         }
       };
     }
+  }
 
+  public static class WildcardTypeBuilder {
+    private List<Type> upper;
+    private List<Type> lower;
 
+    public WildcardTypeBuilder() {
+      upper = new ArrayList<>();
+      lower = new ArrayList<>();
+    }
+
+    public WildcardTypeBuilder addUpper(Type bound) {
+      upper.add(bound);
+      return this;
+    }
+
+    public WildcardTypeBuilder addLower(Type lower) {
+      upper.add(lower);
+      return this;
+    }
+
+    public WildcardType build() {
+      return new WildcardType() {
+        @Override
+        public Type[] getUpperBounds() {
+          return upper.toArray(new Type[0]);
+        }
+
+        @Override
+        public Type[] getLowerBounds() {
+          return lower.toArray(new Type[0]);
+        }
+      };
+    }
+  }
+
+  public static class GenericArrayTypeBuilder {
+    private final Type component;
+
+    public GenericArrayTypeBuilder(Type component) {
+      this.component = component;
+    }
+
+    public GenericArrayType build() {
+      return new GenericArrayType() {
+        @Override
+        public Type getGenericComponentType() {
+          return component;
+        }
+      };
+    }
   }
 }

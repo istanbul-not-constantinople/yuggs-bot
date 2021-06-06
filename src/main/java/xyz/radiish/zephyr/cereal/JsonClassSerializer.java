@@ -19,7 +19,7 @@ public class JsonClassSerializer<T extends JsonElementSerializer> extends JsonSe
   @Override
   public T deserialize(Optional<T> instance, JsonElement element, Type type) {
     T newInstance = instance.orElse(newInstance());
-    newInstance.deserialize(element);
+    newInstance.deserialize(element, type);
     return newInstance;
   }
 }

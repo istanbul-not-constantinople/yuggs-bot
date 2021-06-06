@@ -28,7 +28,7 @@ public class UwuifyCommand {
         if(chance < 0.02 * severity) {
           return String.format("uwu %s", word);
         } else if(chance < 0.025 * severity) {
-          return String.format("%s %s %s", word, VERBS.get(random.nextInt(VERBS.size())), NOUNS.get(random.nextInt(NOUNS.size())));
+          return String.format("%s \\*%s %s\\*", word, VERBS.get(random.nextInt(VERBS.size())), NOUNS.get(random.nextInt(NOUNS.size())));
         } else if(chance < 0.0275 * severity) {
           return String.format("%s (punish me please)", word);
         }
@@ -38,7 +38,8 @@ public class UwuifyCommand {
       TextUtils.PatternMorph.of("t(['])?s",   "sh"),
       TextUtils.PatternMorph.of("([aeiou])u", "$1u"),
       TextUtils.PatternMorph.of("([f])u",     "$1wu"),
-      TextUtils.PatternMorph.of("[:;][)\\]}]","uwu")
+      TextUtils.PatternMorph.of("[:;][)\\]}]","uwu"),
+      String::toLowerCase
     );
   }
 

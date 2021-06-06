@@ -6,7 +6,7 @@ import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
-import xyz.radiish.zephyr.util.ClassUtils;
+import xyz.radiish.zephyr.util.TypeUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
@@ -117,7 +117,7 @@ public class JsonSerializing {
   }
 
   public static <T> T deserialize(Type type, JsonElement element) {
-    return (T) deserialize(ClassUtils.ofType(type), element, type);
+    return (T) deserialize(TypeUtils.ofType(type), element, type);
   }
   public static <T> T deserialize(Class<T> clazz, JsonElement element, Type type) {
     if(element == JsonNull.INSTANCE) {

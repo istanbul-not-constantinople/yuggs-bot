@@ -8,10 +8,12 @@ import com.mongodb.*;
 import org.bson.BSONObject;
 import xyz.radiish.zephyr.cereal.JsonArrayBuilder;
 import xyz.radiish.zephyr.cereal.JsonObjectBuilder;
+import xyz.radiish.zephyr.cereal.JsonSerializing;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -57,5 +59,18 @@ public class MongoHelper {
     JsonObjectBuilder builder = new JsonObjectBuilder();
     object.toMap().forEach((key, value) -> builder.put((String) key, objectToJsonElement(value)));
     return builder.build();
+  }
+
+  public static <T> T fetch(DBCollection collection, Object id, Class<?> clazz, Supplier<T> supplier) {
+    DBObject object = collection.find(new BasicDBObject("_id", id)).one();
+    if(object != null) {
+      return JsonSerializing.deserialize(clazz, MongoHelper.objectToJson(object));
+    } else {
+      return supplier.get();
+    }
+  }
+
+  public static void update(DBCollection collection, Object record, Object id) {
+    collection.update(new BasicDBObject("_id", id), MongoHelper.jsonToObject(JsonSerializing.serialize(record).getAsJsonObject()), true, false);
   }
 }
